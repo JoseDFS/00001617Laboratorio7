@@ -1,3 +1,4 @@
+#include <iostream>
 node selectNode(int i, element e,mesh &m){
 	node n;
 	switch(i){
@@ -125,6 +126,7 @@ float calculateLocalJ(int i,mesh m){
 
 Matrix createLocalK(int e,mesh &m){
     //Preparaci�n de ingredientes
+    cout<<"K";
     float t,k,lambda,v,trident,delta,eta,Ae,J,D;
     
     //Componentes de K
@@ -146,7 +148,7 @@ Matrix createLocalK(int e,mesh &m){
     calculateGammaMatrix(g_matrix);
     calculateLocalA(e,Alpha,m);
     calculateBetaMatrix(Beta);
-    productRealMatrix(t*J/(6*D),productMatrixMatrix(g_matrix,productMatrixMatrix(Alpha,Beta,2,2,6),6,2,6),matrixA);
+    productRealMatrix(t*J/(24*D),productMatrixMatrix(g_matrix,productMatrixMatrix(Alpha,Beta,2,2,6),6,2,6),matrixA);
 
     //Preparando matrixK (En clase conocida simplemente como K)
     k = m.getParameter(KAPPA);
@@ -154,7 +156,7 @@ Matrix createLocalK(int e,mesh &m){
     transpose(Alpha,Alphat);
     transpose(Beta,Betat);
     productRealMatrix(k*Ae/(D*D),productMatrixMatrix(Betat,productMatrixMatrix(Alphat,productMatrixMatrix(Alpha,Beta,2,2,6),2,2,6),6,2,6),matrixK);
-
+    cout<<"Kappa \n";
     /*Preparando matrixG (En clase conocida simplemente como G)
     rho = m.getParameter(DENSITY);
     calculateBPrima(BPrima);
@@ -163,22 +165,29 @@ Matrix createLocalK(int e,mesh &m){
     calculateBPrima(BPrima);
     productRealMatrix(delta*Ae/(8*D*D),productMatrixMatrix(Betat,productMatrixMatrix(Alphat,productMatrixMatrix(Alpha,BPrima,2,2,3),2,2,3),6,2,3),matrixG);
 
+    cout<<"delta \n";
     lambda = m.getParameter(LAMBDA);
     calculateBPrima(BPrima);
     productRealMatrix(lambda*J/(9*D),productMatrixMatrix(g_matrix,productMatrixMatrix(Alpha,BPrima,2,2,3),6,2,3),MatrixH);
+
+    cout<<"lambda \n";
     //Preparando matrixD (En clase conocida simplemente como D)
     transpose(BPrima,BPrimat);
     transpose(g_matrix,g_matrix_t);
     productRealMatrix(J/(6*D),productMatrixMatrix(BPrimat,productMatrixMatrix(Alphat,g_matrix_t,2,2,6),3,2,6),matrixD);
-
+    cout<<"TRANSPOSE \n";
     
-
+    productRealMatrix(-1,matrixG,MatrixI);
     //Colocando submatrices en K
     zeroes(K,9);
+    cout<<"zeroes \n";
     ubicarSubMatriz(K,0,5,0,5,sumMatrix(matrixA,matrixK,6,6));
+    cout<<"Ubi 1 \n";
     ubicarSubMatriz(K,0,5,6,8,sumMatrix(MatrixI,MatrixH,6,3));
-    ubicarSubMatriz(K,6,8,0,5,matrixD );
+    cout<<"Ubi 2 \n";
+    ubicarSubMatriz(K,6,8,0,5,matrixD);
 
+    cout<<"K retornada \n";
     return K;
 }
 
